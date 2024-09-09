@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Typography, Button, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
+import '../App.css'; // Ensure this CSS file is imported
 
 const HomePage = () => {
   return (
@@ -16,10 +17,20 @@ const HomePage = () => {
           height: '100%',  // Ensure it takes full available height
         }}
       >
-        <Typography variant="h3" component="h1" gutterBottom>
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          gutterBottom 
+          className="poppins-bold"  // Apply bold font style
+        >
           Welcome to the Admin Site
         </Typography>
-        <Typography variant="h6" component="p" gutterBottom>
+        <Typography 
+          variant="h6" 
+          component="p" 
+          gutterBottom 
+          className="poppins-light"  // Apply light font style
+        >
           Manage your inventory and sales with ease. Please login or register to continue.
         </Typography>
         <Box sx={{ mt: 4 }}>
@@ -29,10 +40,17 @@ const HomePage = () => {
             component={Link}
             to="/login"
             sx={{ marginRight: 2 }}
+            className="poppins-medium"  // Apply medium font style to the button
           >
             Login
           </Button>
-          <Button variant="outlined" color="primary" component={Link} to="/register">
+          <Button 
+            variant="outlined" 
+            color="primary" 
+            component={Link} 
+            to="/register"
+            className="poppins-medium"  // Apply medium font style to the button
+          >
             Register
           </Button>
         </Box>

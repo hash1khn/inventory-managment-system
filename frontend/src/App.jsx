@@ -12,16 +12,25 @@ import { Box } from '@mui/material';
 import './App.css';
 
 // Create a Material UI theme
+// Create a Material UI theme with the new color palette
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: '#1A1341',  // Dark Purple (Primary)
     },
     secondary: {
-      main: '#dc004e',
+      main: '#6290C3',  // Blue (Secondary)
+    },
+    background: {
+      default: '#C2E7DA',  // Light Teal for background
+    },
+    text: {
+      primary: '#1A1341',  // Dark Purple for primary text
+      secondary: '#F1FFEZ',  // Light color for secondary text (adjust if too light)
     },
   },
 });
+
 
 function App() {
   return (
