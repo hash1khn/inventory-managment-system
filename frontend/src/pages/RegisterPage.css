@@ -1,0 +1,31 @@
+/* Define button styles */
+.ant-btn-custom {
+    background-color: #6290C3; /* Primary button color */
+    border-color: #6290C3;     /* Border color */
+    color: #fff;              /* Text color */
+    font-weight: 500;         /* Font weight for button text */
+  }
+  
+  .ant-btn-custom:hover,
+  .ant-btn-custom:focus {
+    background-color: #1A1341; /* Darker shade for hover */
+    border-color: #1A1341;
+  }
+  
+  /* Container styling for the register page */
+  .register-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Title styling */
+  .register-title {
+    text-align: center;
+  }
+  
+  /* Margin for error alert */
+  .error-alert {
+    margin-top: 1rem;
+  }
+  
