@@ -1,7 +1,6 @@
 import React from 'react';
 import { Container, Typography, Button, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
-import '../App.css'; // Ensure this CSS file is imported
 
 const HomePage = () => {
   return (
@@ -21,15 +20,21 @@ const HomePage = () => {
           variant="h3" 
           component="h1" 
           gutterBottom 
-          className="poppins-bold"  // Apply bold font style
+          sx={{
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 'bold',
+          }}
         >
-          Welcome to the Admin Site
+          Welcome to Tech Haven
         </Typography>
         <Typography 
           variant="h6" 
           component="p" 
           gutterBottom 
-          className="poppins-light"  // Apply light font style
+          sx={{
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: '300',  // Light font weight
+          }}
         >
           Manage your inventory and sales with ease. Please login or register to continue.
         </Typography>
@@ -39,8 +44,11 @@ const HomePage = () => {
             color="primary"
             component={Link}
             to="/login"
-            sx={{ marginRight: 2 }}
-            className="poppins-medium"  // Apply medium font style to the button
+            sx={{
+              marginRight: 2,
+              fontFamily: 'Poppins, sans-serif',
+              fontWeight: '500',  // Medium font weight
+            }}
           >
             Login
           </Button>
@@ -49,7 +57,10 @@ const HomePage = () => {
             color="primary" 
             component={Link} 
             to="/register"
-            className="poppins-medium"  // Apply medium font style to the button
+            sx={{
+              fontFamily: 'Poppins, sans-serif',
+              fontWeight: '500',  // Medium font weight
+            }}
           >
             Register
           </Button>

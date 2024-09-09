@@ -9,13 +9,23 @@ const Footer = () => {
         py: 2,
         px: 2,
         mt: 'auto',
-        backgroundColor: (theme) =>
-          theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
+        backgroundColor: '#C2E7DA', // Light green background color from your theme
+        display: 'flex',
+        alignItems: 'center', // Center text vertically
+        justifyContent: 'center', // Center text horizontally
       }}
     >
       <Container maxWidth="lg">
-        <Typography variant="body1">
-          Admin Site © {new Date().getFullYear()}
+        <Typography
+          variant="body1"
+          sx={{
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: '300', // Light font weight
+            textAlign: 'center',
+            color: '#1A1341', // Dark blue text color from your theme
+          }}
+        >
+          Tech Haven © {new Date().getFullYear()}
         </Typography>
       </Container>
     </Box>
