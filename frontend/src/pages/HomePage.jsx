@@ -38,33 +38,7 @@ const HomePage = () => {
         >
           Manage your inventory and sales with ease. Please login or register to continue.
         </Typography>
-        <Box sx={{ mt: 4 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            component={Link}
-            to="/login"
-            sx={{
-              marginRight: 2,
-              fontFamily: 'Poppins, sans-serif',
-              fontWeight: '500',  // Medium font weight
-            }}
-          >
-            Login
-          </Button>
-          <Button 
-            variant="outlined" 
-            color="primary" 
-            component={Link} 
-            to="/register"
-            sx={{
-              fontFamily: 'Poppins, sans-serif',
-              fontWeight: '500',  // Medium font weight
-            }}
-          >
-            Register
-          </Button>
-        </Box>
+        
       </Box>
     </Container>
   );
