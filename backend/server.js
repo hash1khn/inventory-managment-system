@@ -13,7 +13,7 @@ app.use(cors({
   origin: 'http://localhost:5173',  // Allow requests from your Vite frontend
   credentials: true                 // Allow cookies to be sent with the requests if necessary
 }));
-
+  
 // Middleware
 app.use(express.json());
 app.use(morgan('dev')); // Add Morgan for logging requests

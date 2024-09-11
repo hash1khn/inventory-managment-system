@@ -69,9 +69,8 @@ const RegisterPage = () => {
         </Form.Item>
         <Form.Item>
           <Button 
-            type="primary" 
             htmlType="submit" 
-            size="large" 
+            size="large"
             className="ant-btn-custom"
           >
             Register

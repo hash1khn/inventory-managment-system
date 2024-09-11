@@ -1,4 +1,3 @@
-/* Define button styles */
 .ant-btn-custom {
     background-color: #1A1341 !important; /* Primary button color */
     border-color: #1A1341 !important;     /* Border color */
@@ -11,21 +10,4 @@
 .ant-btn-custom:focus {
     background-color: #1A1341 !important; /* Darker shade for hover */
     border-color: #1A1341 !important;
-}
-
-/* Container styling for the register page */
-.register-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-/* Title styling */
-.register-title {
-    text-align: center;
-}
-
-/* Margin for error alert */
-.error-alert {
-    margin-top: 1rem;
 }
