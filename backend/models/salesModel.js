@@ -22,6 +22,11 @@ const salesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  saleAttendant:{
+    type:String,
+    required: true,
+
+  },
   deviceId: {  // Modified to match the updated deviceId in deviceModel
     type: Number,
     required: true,

@@ -84,7 +84,7 @@ const paystack = require('../utils/payment'); // Paystack initialized here
 
 // Create a new sale and generate a receipt (no payment gateway for now)
 exports.createSale = async (req, res) => {
-  const { customerName, customerEmail, customerAddress, customerPhone, deviceId, salePrice } = req.body;
+  const { customerName, customerEmail, customerAddress, customerPhone, deviceId,saleAttendant } = req.body;
 
   try {
     const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
@@ -94,6 +94,7 @@ exports.createSale = async (req, res) => {
     if (!device) {
       return res.status(404).json({ message: 'Device not found or unauthorized' });
     }
+    const salePrice=device.salePrice
 
     // Create the sale entry
     const sale = new Sales({
@@ -101,7 +102,8 @@ exports.createSale = async (req, res) => {
       customerName,
       customerEmail,
       customerAddress,  // Include the customer address
-      customerPhone,    // Include the customer phone number
+      customerPhone, 
+      saleAttendant,   // Include the customer phone number
       deviceId,         // Use the new deviceId number format
       salePrice,
       paymentStatus: 'Completed', // Assume payment is "Completed" for now
