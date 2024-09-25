@@ -14,7 +14,7 @@ const RegisterPage = () => {
         const { ownerName, storeName, email, password, address, phone } = values;
         try {
             await register(ownerName, storeName, email, password, address, phone);
-            navigate("/login"); // Redirect to login page after registration
+            navigate('/check-email'); 
         } catch (err) {
             setError("Registration failed");
         }

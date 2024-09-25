@@ -4,6 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import CheckEmailPage from './pages/CheckEmailPage';
 import InventoryPage from './pages/InventoryPage';
 import SalesPage from './pages/SalesPage';
 import Navbar from './components/Navbar';
@@ -47,6 +48,7 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/inventory" element={<InventoryPage />} />
               <Route path="/sales" element={<SalesPage />} />
+              <Route path="/check-email" element={<CheckEmailPage />} />
               <Route path="/" element={<HomePage />} />  {/* HomePage as default route */}
             </Routes>
           </Box>
