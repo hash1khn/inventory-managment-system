@@ -4,7 +4,7 @@ const Store = require('../models/storeModel');
 
 // Add a new device to the inventory
 exports.addDevice = async (req, res) => {
-  const { deviceType, modelName, price, productNumber, quantityAvailable } = req.body;
+  const { deviceType, modelName, price, productNumber } = req.body;
 
   try {
     const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
@@ -16,7 +16,6 @@ exports.addDevice = async (req, res) => {
       modelName,
       price,
       productNumber,
-      quantityAvailable,
     });
 
     await newDevice.save();
@@ -54,7 +53,6 @@ exports.getAllDevices = async (req, res) => {
 
     // Find all devices for the store owner
     const devices = await Device.find({ storeId: storeOwner.id });
-
     res.status(200).json(devices);
   } catch (err) {
     console.error(err);

@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-router.post('/create-sale', authMiddleware, createSale);          // Log a sale
+router.post('/initiate-sale', authMiddleware, createSale);          // Log a sale
 router.get('/get-all-receipts', authMiddleware, getReceipts);        // Get all receipts for the store
 router.get('/receipt/:id', authMiddleware, getReceiptById);  // Get receipt by ID
 
