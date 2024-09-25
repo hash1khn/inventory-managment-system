@@ -5,6 +5,7 @@ const InventoryForm = ({ onAdd }) => {
     const [form] = Form.useForm();
 
     const handleSubmit = (values) => {
+        console.log(values);
         onAdd(values);
         form.resetFields();
     };
