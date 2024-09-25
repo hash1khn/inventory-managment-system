@@ -84,65 +84,70 @@ const paystack = require('../utils/payment'); // Paystack initialized here
 
 // Create a new sale and generate a receipt (no payment gateway for now)
 exports.createSale = async (req, res) => {
-    const { customerName, customerEmail, deviceId, salePrice } = req.body;
-  
-    try {
-      const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
-      // Find the device being sold
-      const device = await Device.findById(deviceId);
-      if (!device || device.storeId.toString() !== storeOwner.id) {
-        return res.status(404).json({ message: 'Device not found or unauthorized' });
-      }
-  
-      // Create the sale entry
-      const sale = new Sales({
-        storeId: storeOwner.id,
-        customerName,
-        customerEmail,
-        deviceId,
-        salePrice,
-        paymentStatus: 'Completed',  // We'll assume the payment is "Completed" since no payment gateway is involved for now
-      });
-  
-      await sale.save();
-  
-      // Generate a digital receipt (a simple string for now)
-      const receipt = `Receipt for ${customerName}, device: ${device.modelName}, price: $${salePrice}, sold by ${storeOwner.storeName}`;
-      sale.receipt = receipt;
-  
-      await sale.save();
-  
-      // Optionally, send receipt via email
-      const transporter = nodemailer.createTransport({
-        host: 'smtp-relay.brevo.com', // Or another email service (e.g., Brevo)
-        port:587,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
-  
-      const mailOptions = {
-        from: 'hashirkhan.tech@gmail.com',
-        to: customerEmail,
-        subject: 'Your Purchase Receipt',
-        text: `Thank you for your purchase. Here is your receipt: ${receipt}`,
-      };
-  
-      transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-          console.error('Error sending receipt email:', err);
-          return res.status(500).json({ message: 'Receipt email failed' });
-        }
-        console.log('Receipt email sent:', info.response);
-      });
-  
-      res.status(201).json({ message: 'Sale logged and receipt generated', sale });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
+  const { customerName, customerEmail, customerAddress, customerPhone, deviceId, salePrice } = req.body;
+
+  try {
+    const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
+
+    // Find the device being sold using the new deviceId format
+    const device = await Device.findOne({ deviceId, storeId: storeOwner.id });
+    if (!device) {
+      return res.status(404).json({ message: 'Device not found or unauthorized' });
     }
-  };
+
+    // Create the sale entry
+    const sale = new Sales({
+      storeId: storeOwner.id,
+      customerName,
+      customerEmail,
+      customerAddress,  // Include the customer address
+      customerPhone,    // Include the customer phone number
+      deviceId,         // Use the new deviceId number format
+      salePrice,
+      paymentStatus: 'Completed', // Assume payment is "Completed" for now
+    });
+
+    // Save the sale entry to the database
+    await sale.save();
+
+    // Generate a digital receipt (a simple string for now)
+    const receipt = `Receipt for ${customerName}, device: ${device.modelName}, price: $${salePrice}, sold by ${storeOwner.storeName}`;
+    sale.receipt = receipt;
+
+    // Save the sale again with the receipt included
+    await sale.save();
+
+    // Optionally, send receipt via email
+    const transporter = nodemailer.createTransport({
+      host: 'smtp-relay.brevo.com', // Or another email service (e.g., Brevo)
+      port: 587,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: 'hashirkhan.tech@gmail.com',
+      to: customerEmail,
+      subject: 'Your Purchase Receipt',
+      text: `Thank you for your purchase. Here is your receipt: ${receipt}`,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error('Error sending receipt email:', err);
+        return res.status(500).json({ message: 'Receipt email failed' });
+      }
+      console.log('Receipt email sent:', info.response);
+    });
+
+    res.status(201).json({ message: 'Sale logged and receipt generated', sale });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 // Get all receipts for the store owner
 exports.getReceipts = async (req, res) => {

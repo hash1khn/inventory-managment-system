@@ -1,4 +1,3 @@
-// models/salesModel.js
 const mongoose = require('mongoose');
 
 const salesSchema = new mongoose.Schema({
@@ -15,9 +14,16 @@ const salesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  deviceId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Device',
+  customerAddress: {  // New field for customer address
+    type: String,
+    required: true,
+  },
+  customerPhone: {  // New field for customer phone number
+    type: String,
+    required: true,
+  },
+  deviceId: {  // Modified to match the updated deviceId in deviceModel
+    type: Number,
     required: true,
   },
   salePrice: {
