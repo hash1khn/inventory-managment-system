@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Typography, Alert } from 'antd';
 import { login } from '../services/authService';
 import { useNavigate } from 'react-router-dom';  // useNavigate instead of useHistory
-import 'LoginPage.css';
+import './LoginPage.css';
 
 const { Title } = Typography;
 
