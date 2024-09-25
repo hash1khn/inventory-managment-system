@@ -11,9 +11,9 @@ const RegisterPage = () => {
     const navigate = useNavigate();
 
     const handleSubmit = async (values) => {
-        const { ownerName, storeName, email, password, address } = values;
+        const { ownerName, storeName, email, password, address, phone } = values;
         try {
-            await register(ownerName, storeName, email, password, address);
+            await register(ownerName, storeName, email, password, address, phone);
             navigate("/login"); // Redirect to login page after registration
         } catch (err) {
             setError("Registration failed");
@@ -56,7 +56,16 @@ const RegisterPage = () => {
                     ]}>
                     <Input type="text" placeholder="Address" size="large" />
                 </Form.Item>
-
+                <Form.Item
+                    name="phone"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Please input your phone number!",
+                        },
+                    ]}>
+                    <Input type="text" placeholder="Phone Number" size="large" />
+                </Form.Item>
                 <Form.Item
                     name="email"
                     rules={[
