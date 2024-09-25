@@ -16,7 +16,7 @@ const Navbar = () => {
                 {/* Logo area */}
 
                 <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
-                    <Link href='/'>
+                <Link to="/" style={{ textDecoration: 'none' }}>
                         <Typography
                             variant="h6"
                             component="div"
@@ -25,8 +25,8 @@ const Navbar = () => {
                                 fontFamily: "Poppins",
                                 fontWeight: "bold",
                                 color: "#C2E7DA",
-                                
-                            }}>
+                            }}
+                        >
                             Tech Haven
                         </Typography>
                     </Link>
