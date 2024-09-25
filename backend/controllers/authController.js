@@ -86,8 +86,7 @@ exports.verifyEmail = async (req, res) => {
     storeOwner.emailVerificationToken = undefined;
 
     await storeOwner.save();
-
-    res.status(200).json({ message: 'Email verified successfully. You can now log in.' });
+    res.redirect('/login');
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error verifying email' });
