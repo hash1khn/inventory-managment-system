@@ -25,6 +25,7 @@ const Navbar = () => {
                                 fontFamily: "Poppins",
                                 fontWeight: "bold",
                                 color: "#C2E7DA",
+                                
                             }}>
                             Tech Haven
                         </Typography>

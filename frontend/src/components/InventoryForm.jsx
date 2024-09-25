@@ -1,63 +1,59 @@
-import React, { useState } from 'react';
-import { addDevice } from '../services/inventoryService';
+import React from 'react';
+import { Form, Input, InputNumber, Button } from 'antd';
 
 const InventoryForm = ({ onAdd }) => {
-  const [deviceType, setDeviceType] = useState('');
-  const [modelName, setModelName] = useState('');
-  const [price, setPrice] = useState('');
-  const [quantityAvailable, setQuantityAvailable] = useState('');
+  const [form] = Form.useForm();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newDevice = { deviceType, modelName, price, quantityAvailable };
-
-    try {
-      const response = await addDevice(newDevice);  // Call the addDevice API service
-      if (response) {
-        onAdd(newDevice);  // Call parent function to update the inventory list
-        setDeviceType('');
-        setModelName('');
-        setPrice('');
-        setQuantityAvailable('');
-      }
-    } catch (err) {
-      console.error('Error adding device:', err);
-    }
+  const handleSubmit = (values) => {
+    onAdd(values);
+    form.resetFields();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Add New Device</h3>
-      <input
-        type="text"
-        placeholder="Device Type"
-        value={deviceType}
-        onChange={(e) => setDeviceType(e.target.value)}
-        required
-      />
-      <input
-        type="text"
-        placeholder="Model Name"
-        value={modelName}
-        onChange={(e) => setModelName(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Price"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Quantity Available"
-        value={quantityAvailable}
-        onChange={(e) => setQuantityAvailable(e.target.value)}
-        required
-      />
-      <button type="submit">Add Device</button>
-    </form>
+    <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      <Form.Item
+        label="Model Name"
+        name="modelName"
+        rules={[{ required: true, message: 'Please enter the model name' }]}
+      >
+        <Input />
+      </Form.Item>
+
+      <Form.Item
+        label="Price"
+        name="price"
+        rules={[{ required: true, message: 'Please enter the price' }]}
+      >
+        <InputNumber min={0} style={{ width: '100%' }} />
+      </Form.Item>
+
+      <Form.Item
+        label="Quantity Available"
+        name="quantityAvailable"
+        rules={[{ required: true, message: 'Please enter the quantity available' }]}
+      >
+        <InputNumber min={0} style={{ width: '100%' }} />
+      </Form.Item>
+
+      <Form.Item
+        label="Product Number"
+        name="productNumber"
+        rules={[{ required: true, message: 'Please enter the product number' }]}
+      >
+        <Input />
+      </Form.Item>
+
+      <Form.Item>
+      <Button 
+            type="primary" 
+            htmlType="submit" 
+            size="large" 
+            className="ant-btn-custom"
+          >
+            Add Device
+          </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

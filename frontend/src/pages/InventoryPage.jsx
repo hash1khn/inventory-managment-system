@@ -20,13 +20,16 @@ const InventoryPage = () => {
   return (
     <div>
       <h2>Inventory</h2>
-      <ul>
+      
         {devices.map((device) => (
-          <li key={device._id}>
+          <p key={device._id}>
             {device.modelName} - ${device.price} ({device.quantityAvailable} available)
-          </li>
+          </p>
         ))}
-      </ul>
+
+      <h2>Add Device</h2>
+
+      
       <InventoryForm onAdd={handleAddDevice} />
     </div>
   );
