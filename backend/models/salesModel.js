@@ -14,21 +14,33 @@ const salesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  customerAddress: {  // New field for customer address
+  customerAddress: {
     type: String,
     required: true,
   },
-  customerPhone: {  // New field for customer phone number
+  customerPhone: {
     type: String,
     required: true,
   },
-  saleAttendant:{
-    type:String,
+  saleAttendant: {
+    type: String,  // Name of the sales attendant handling the sale
     required: true,
-
   },
-  deviceId: {  // Modified to match the updated deviceId in deviceModel
-    type: Number,
+  imei: {
+    type: String,  // IMEI number for the device being sold
+    required: true,
+    unique: true,  // Ensures that each IMEI is unique
+  },
+  deviceType: {
+    type: String, // Automatically fetched from Device model
+    required: true,
+  },
+  brand: {
+    type: String, // Automatically fetched from Device model
+    required: true,
+  },
+  modelName: {
+    type: String, // Model name of the device
     required: true,
   },
   salePrice: {
@@ -42,10 +54,11 @@ const salesSchema = new mongoose.Schema({
   paymentStatus: {
     type: String,
     enum: ['Pending', 'Completed'],
-    default: 'Pending',
+    default: 'Completed',  // Assuming payment is completed as per your current logic
   },
   receipt: {
-    type: String, // URL or link to the digital receipt
+    type: String,  // Digital receipt as a string
+    required: true,
   },
 });
 
