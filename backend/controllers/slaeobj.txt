@@ -1,0 +1,21 @@
+{
+    "customerName": "dasadad",
+    "customerEmail": "dadasd@kfsdf.vom",
+    "customerAddress": "dasdadd",
+    "customerPhone": "1231313",
+    "saleAttendant": "muneeb",
+    "cart": [
+        {
+            "deviceId": "6710b72ef14177fb82301ec6",
+            "quantity": 2
+        },
+        {
+            "deviceId": "6710b77df14177fb82301eca",
+            "quantity": 5
+        },
+        {
+            "deviceId": "6710bb0bdf86a2b18091252d",
+            "quantity": 7
+        }
+    ]
+}

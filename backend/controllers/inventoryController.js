@@ -13,9 +13,9 @@ exports.addDevice = async (req, res) => {
       return res.status(401).json({ message: 'Unauthorized, store owner not found' });
     }
 
-    // Create a new device with the logged-in store owner's storeId
+
     const newDevice = new Device({
-      storeId: storeOwner.id, // storeId from the authenticated user
+      storeId: storeOwner.id, 
       deviceType,
       brand,
       modelName,
