@@ -19,6 +19,11 @@ export const getInventory = async () => {
 
 export const addDevice = async (deviceData) => {
   const token = localStorage.getItem('token');
+  
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
   try {
     const response = await axios.post(`${API_URL}/add-device`, deviceData, {
       headers: {
@@ -27,7 +32,7 @@ export const addDevice = async (deviceData) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error adding device:', error);
+    console.error('Error adding device:', error.response ? error.response.data : error.message);
     throw error; // Re-throw the error for further handling
   }
 };

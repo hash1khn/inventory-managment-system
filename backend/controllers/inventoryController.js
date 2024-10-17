@@ -60,23 +60,62 @@ exports.getDeviceById = async (req, res) => {
 };
 
 // Get all devices in the store's inventory
-exports.getAllDevices = async (req, res) => {
+exports.addDevice = async (req, res) => {
+  const { deviceType, brand, modelName, price, quantityAvailable } = req.body;
+
+  console.log('Received request to add device:', req.body); // Debugging: Log request body
+
   try {
     const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
+    console.log('Authenticated store owner:', storeOwner.id); // Debugging: Log store owner
 
-    // Find all devices for the store owner
-    const devices = await Device.find({ storeId: storeOwner.id });
+    // Ensure price and quantityAvailable are numbers
+    const parsedPrice = Number(price);
+    const parsedQuantity = Number(quantityAvailable);
 
-    if (!devices.length) {
-      return res.status(404).json({ message: 'No devices found in inventory' });
+    // Check if parsing was successful
+    if (isNaN(parsedPrice) || isNaN(parsedQuantity)) {
+      return res.status(400).json({ message: 'Price and quantityAvailable must be valid numbers.' });
     }
 
-    res.status(200).json(devices);
+    // Check if a device with the same storeId, deviceType, brand, and modelName already exists
+    const existingDevice = await Device.findOne({
+      storeId: storeOwner.id,
+      deviceType,
+      brand,
+      modelName
+    });
+
+    if (existingDevice) {
+      console.log('Device already exists:', existingDevice); // Debugging: Log existing device
+      return res.status(400).json({ message: 'Device with the same type, brand, and model already exists in the store.' });
+    }
+
+    // Log that the device does not exist, proceed to create a new one
+    console.log('No existing device found, proceeding to add new device');
+
+    // Create a new device with the given details
+    const newDevice = new Device({
+      storeId: storeOwner.id,
+      deviceType,
+      brand,
+      modelName,
+      price: parsedPrice,
+      quantityAvailable: parsedQuantity || 1 // Default quantity to 1 if not provided
+    });
+
+    console.log('Saving new device:', newDevice); // Debugging: Log the new device before saving
+
+    await newDevice.save();
+
+    console.log('Device added successfully:', newDevice); // Debugging: Log success
+    res.status(201).json({ message: 'Device added to inventory', device: newDevice });
   } catch (err) {
-    console.error('Error fetching all devices:', err);
+    console.error('Error adding device:', err); // Debugging: Log error stack trace
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Update a device in the inventory
 exports.updateDevice = async (req, res) => {
