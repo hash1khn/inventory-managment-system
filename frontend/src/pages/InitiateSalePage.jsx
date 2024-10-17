@@ -11,10 +11,9 @@ const InitiateSalePage = () => {
     try {
       const response = await logSale(values);
       console.log('Sale logged successfully:', response);
-      form.resetFields(); // Reset the form after submission
+      form.resetFields(); 
     } catch (error) {
       console.error('Error logging sale:', error);
-      // Handle the error accordingly (e.g., show a notification)
     }
   };
 

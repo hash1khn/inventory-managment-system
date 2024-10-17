@@ -24,7 +24,7 @@ const InventoryPage = () => {
         {devices.map((device) => (
           <p key={device._id}>
             {device.deviceType} - {device.modelName} - ${device.price}<br/>
-            (Product Number: {device.productNumber})
+            {device.brand} - {device.quantityAvailable}<br/>
             <br />
           </p>
         ))}
