@@ -24,6 +24,18 @@ const InitiateSalePage = () => {
 
   const handleAddToCart = (deviceId) => {
     const quantity = quantities[deviceId] || 0; // Get quantity from state
+    const device = devices.find(dev => dev._id === deviceId); // Find the device by ID
+
+    if (!device) {
+      message.error('Device not found.');
+      return;
+    }
+
+    if (quantity > device.availableQuantity) {
+      message.error(`Cannot add more than available quantity (${device.availableQuantity})`);
+      return;
+    }
+
     if (quantity > 0) {
       const existingItem = cart.find(item => item.deviceId === deviceId);
       if (existingItem) {
@@ -86,6 +98,11 @@ const InitiateSalePage = () => {
       dataIndex: 'price',
       key: 'price',
       render: (text) => `$${text.toFixed(2)}`, // Format price
+    },
+    {
+      title: 'Available Quantity',
+      dataIndex: 'availableQuantity',
+      key: 'availableQuantity',
     },
     {
       title: 'Quantity',
