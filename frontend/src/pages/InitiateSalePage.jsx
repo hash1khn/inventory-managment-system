@@ -101,8 +101,8 @@ const InitiateSalePage = () => {
     },
     {
       title: 'Available Quantity',
-      dataIndex: 'availableQuantity',
-      key: 'availableQuantity',
+      dataIndex: 'quantityAvailable',
+      key: 'quanitityAvailable',
     },
     {
       title: 'Quantity',

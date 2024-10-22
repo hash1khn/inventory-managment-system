@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
-import "../App.css"; // Ensure this CSS file is imported
+import "./Navbar.css"; // Ensure this CSS file is imported
 
 const Navbar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -30,7 +30,9 @@ const Navbar = () => {
         <AppBar position="static" sx={{ backgroundColor: "#1A1341" }}>
             <Toolbar>
                 <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
-                <Link to={isLoggedIn ? "/inventory" : "/"} style={{ textDecoration: 'none' }}>
+                    {/* SVG logo */}
+                    <img src="/BOMALOGO.svg" alt="Logo" style={{ width: '40px', marginRight: '10px' }} />
+                    <Link to={isLoggedIn ? "/inventory" : "/"} style={{ textDecoration: 'none' }}>
                         <Typography
                             variant="h6"
                             component="div"
