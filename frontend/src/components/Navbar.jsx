@@ -27,27 +27,21 @@ const Navbar = () => {
     };
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: "#1A1341" }}>
+        <AppBar position="static" sx={{ backgroundColor: "#FFFFFF" }}>
             <Toolbar>
                 <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
                     {/* SVG logo */}
-                    <img src="/BOMALOGO.svg" alt="Logo" style={{ width: '40px', marginRight: '10px' }} />
-                    <Link to={isLoggedIn ? "/inventory" : "/"} style={{ textDecoration: 'none' }}>
-                        <Typography
-                            variant="h6"
-                            component="div"
-                            sx={{
-                                flexGrow: 1,
-                                fontFamily: "Poppins",
-                                fontWeight: "bold",
-                                color: "#C2E7DA",
-                            }}
-                        >
-                            Tech Haven
-                        </Typography>
+                    <Link
+                        to={isLoggedIn ? "/inventory" : "/"}
+                        style={{ textDecoration: "none" }}>
+                        <img
+                            src="/BOMALOGO.svg"
+                            alt="Logo"
+                            style={{ width: "230px", marginRight: "10px" }}
+                        />
                     </Link>
                 </Box>
-                
+
                 {/* Conditional rendering for logged-in state */}
                 {isLoggedIn ? (
                     <>
@@ -55,28 +49,43 @@ const Navbar = () => {
                             color="inherit"
                             component={Link}
                             to="/add-device"
-                            sx={{ fontFamily: "Poppins", fontWeight: "medium" }}>
+                            sx={{
+                                fontFamily: "Poppins",
+                                fontWeight: "medium",
+                                color: "#e53631",
+                            }}>
                             Add Device
                         </Button>
                         <Button
                             color="inherit"
                             component={Link}
                             to="/initiate-sale"
-                            sx={{ fontFamily: "Poppins", fontWeight: "medium" }}>
+                            sx={{
+                                fontFamily: "Poppins",
+                                fontWeight: "medium",
+                                color: "#e53631",
+                            }}>
                             Initiate Sale
                         </Button>
                         <Button
                             color="inherit"
                             component={Link}
                             to="/recall-receipt"
-                            sx={{ fontFamily: "Poppins", fontWeight: "medium" }}>
+                            sx={{
+                                fontFamily: "Poppins",
+                                fontWeight: "medium",
+                                color: "#e53631",
+                            }}>
                             Recall Receipt
                         </Button>
                         <Button
                             color="inherit"
                             onClick={handleLogout}
-                            sx={{ fontFamily: "Poppins", fontWeight: "medium"}}
-                        >
+                            sx={{
+                                fontFamily: "Poppins",
+                                fontWeight: "medium",
+                                color: "#e53631",
+                            }}>
                             Logout
                         </Button>
                     </>
@@ -86,14 +95,22 @@ const Navbar = () => {
                             color="inherit"
                             component={Link}
                             to="/login"
-                            sx={{ fontFamily: "Poppins", fontWeight: "medium" }}>
+                            sx={{
+                                fontFamily: "Poppins",
+                                fontWeight: "medium",
+                                color: "#e53631",
+                            }}>
                             Login
                         </Button>
                         <Button
                             color="inherit"
                             component={Link}
                             to="/register"
-                            sx={{ fontFamily: "Poppins", fontWeight: "medium" }}>
+                            sx={{
+                                fontFamily: "Poppins",
+                                fontWeight: "medium",
+                                color: "#e53631",
+                            }}>
                             Register
                         </Button>
                     </>

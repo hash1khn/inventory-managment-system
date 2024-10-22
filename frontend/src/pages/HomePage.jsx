@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" >
       {/* Center content vertically and horizontally */}
       <Box
         sx={{
@@ -14,6 +14,7 @@ const HomePage = () => {
           alignItems: 'center',
           textAlign: 'center',
           height: '100%',  // Ensure it takes full available height
+          color: "#e53631",
         }}
       >
         <Typography 
@@ -25,7 +26,7 @@ const HomePage = () => {
             fontWeight: 'bold',
           }}
         >
-          Welcome to Tech Haven
+          Welcome to BomTech Software Solutions
         </Typography>
         <Typography 
           variant="h6" 

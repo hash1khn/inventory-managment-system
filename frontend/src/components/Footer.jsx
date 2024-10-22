@@ -9,7 +9,7 @@ const Footer = () => {
         py: 2,
         px: 2,
         mt: 'auto',
-        backgroundColor: '#C2E7DA', // Light green background color from your theme
+        backgroundColor: '#FFFFFF', // Light green background color from your theme
         display: 'flex',
         alignItems: 'center', // Center text vertically
         justifyContent: 'center', // Center text horizontally
@@ -22,10 +22,11 @@ const Footer = () => {
             fontFamily: 'Poppins, sans-serif',
             fontWeight: '300', // Light font weight
             textAlign: 'center',
-            color: '#1A1341', // Dark blue text color from your theme
+            color: '#e53631', // Dark blue text color from your theme
+            backgroundColor: '#FFFFFF',
           }}
         >
-          Tech Haven © {new Date().getFullYear()}
+          BomTech Solutions © {new Date().getFullYear()}
         </Typography>
       </Container>
     </Box>

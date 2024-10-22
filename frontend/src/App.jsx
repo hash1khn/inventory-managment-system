@@ -25,7 +25,7 @@ const theme = createTheme({
       main: '#6290C3',  // Blue (Secondary)
     },
     background: {
-      default: '#C2E7DA',  // Light Teal for background
+      default: '#FFFFFF',  // Light Teal for background
     },
     text: {
       primary: '#1A1341',  // Dark Purple for primary text
