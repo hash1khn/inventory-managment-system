@@ -1,8 +1,8 @@
-const Sales = require('../models/salesModel');
-const Device = require('../models/deviceModel');
-const Store = require('../models/storeModel');
-const nodemailer = require('nodemailer');
-const stripe = require('../utils/payment'); // Paystack initialized here
+const Sales = require("../models/salesModel");
+const Device = require("../models/deviceModel");
+const Store = require("../models/storeModel");
+const nodemailer = require("nodemailer");
+const stripe = require("../utils/payment"); // Paystack initialized here
 
 // // Create a new sale, charge the fee, and generate a receipt
 // exports.createSale = async (req, res) => {
@@ -84,196 +84,226 @@ const stripe = require('../utils/payment'); // Paystack initialized here
 
 // Create a new sale and generate a receipt (no payment gateway for now)
 exports.createSale = async (req, res) => {
-  const { customerName, customerEmail, customerAddress, customerPhone, saleAttendant, cart } = req.body;
+    const {
+        customerName,
+        customerEmail,
+        customerAddress,
+        customerPhone,
+        saleAttendant,
+        cart,
+    } = req.body;
 
-  try {
-    const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
+    try {
+        const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
 
-    let totalAmount = 0;
-    let devicesSold = [];
+        let totalAmount = 0;
+        let devicesSold = [];
 
-    // Loop through the cart and process each item
-    for (const item of cart) {
-      const device = await Device.findOne({
-        _id: item.deviceId,
-        storeId: storeOwner.id
-      });
+        // Loop through the cart and process each item
+        for (const item of cart) {
+            const device = await Device.findOne({
+                _id: item.deviceId,
+                storeId: storeOwner.id,
+            });
 
-      if (!device) {
-        return res.status(404).json({ message: `Device with ID ${item.deviceId} not found in inventory` });
-      }
+            if (!device) {
+                return res
+                    .status(404)
+                    .json({
+                        message: `Device with ID ${item.deviceId} not found in inventory`,
+                    });
+            }
 
-      // Check if the device has enough quantity
-      if (device.quantityAvailable < item.quantity) {
-        return res.status(400).json({ message: `Insufficient quantity for ${device.modelName}` });
-      }
+            // Check if the device has enough quantity
+            if (device.quantityAvailable < item.quantity) {
+                return res
+                    .status(400)
+                    .json({
+                        message: `Insufficient quantity for ${device.modelName}`,
+                    });
+            }
 
-      // Calculate the total price for this item and add to totalAmount
-      const itemTotalPrice = item.quantity * device.price;
-      totalAmount += itemTotalPrice;
+            // Calculate the total price for this item and add to totalAmount
+            const itemTotalPrice = item.quantity * device.price;
+            totalAmount += itemTotalPrice;
 
-      // Decrease the device quantity
-      device.quantityAvailable -= item.quantity;
-      await device.save();
+            // Decrease the device quantity
+            device.quantityAvailable -= item.quantity;
+            await device.save();
 
-      // Store the details of the sold device for the receipt
-      devicesSold.push({
-        deviceId: device._id,
-        modelName: device.modelName,
-        quantity: item.quantity,
-        itemTotalPrice: itemTotalPrice
-      });
+            // Store the details of the sold device for the receipt
+            devicesSold.push({
+                deviceId: device._id,
+                modelName: device.modelName,
+                quantity: item.quantity,
+                itemTotalPrice: itemTotalPrice,
+            });
+        }
+
+        // Generate a digital receipt (a simple string for now)
+        let receipt = `Receipt for ${customerName}\nDevices Sold:\n`;
+        devicesSold.forEach((device) => {
+            receipt += ` - ${device.modelName}: ${device.quantity} units, Total: $${device.itemTotalPrice}\n`;
+        });
+        receipt += `Total Amount: $${totalAmount}\nSold by: ${storeOwner.storeName}\nAttendant: ${saleAttendant}`;
+
+        // Create the sale entry
+        const sale = new Sales({
+            storeId: storeOwner.id,
+            customerName,
+            customerEmail,
+            customerAddress,
+            customerPhone,
+            saleAttendant,
+            devices: devicesSold, // Stores the list of sold devices
+            totalAmount, // Total price of all sold devices
+            paymentStatus: "Completed", // Assume payment is "Completed" for now
+            receipt, // The generated receipt string
+        });
+
+        // Save the sale entry to the database
+        await sale.save();
+
+        // Optionally, send receipt via email
+        const transporter = nodemailer.createTransport({
+            host: "smtp-relay.brevo.com", // Or another email service (e.g., Brevo)
+            port: 587,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            from: "hashirkhan.tech@gmail.com",
+            to: customerEmail,
+            subject: "Your Purchase Receipt",
+            text: `Thank you for your purchase. Here is your receipt:\n\n${receipt}`,
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.error("Error sending receipt email:", err);
+                return res
+                    .status(500)
+                    .json({ message: "Receipt email failed" });
+            }
+            console.log("Receipt email sent:", info.response);
+        });
+
+        res.status(201).json({
+            message: "Sale logged and receipt generated",
+            sale,
+        });
+    } catch (err) {
+        console.error("Error creating sale:", err);
+        res.status(500).json({ message: "Server error" });
     }
-
-    // Generate a digital receipt (a simple string for now)
-    let receipt = `Receipt for ${customerName}\nDevices Sold:\n`;
-    devicesSold.forEach(device => {
-      receipt += ` - ${device.modelName}: ${device.quantity} units, Total: $${device.itemTotalPrice}\n`;
-    });
-    receipt += `Total Amount: $${totalAmount}\nSold by: ${storeOwner.storeName}`;
-
-    // Create the sale entry
-    const sale = new Sales({
-      storeId: storeOwner.id,
-      customerName,
-      customerEmail,
-      customerAddress,
-      customerPhone,
-      saleAttendant,
-      devices: devicesSold, // Stores the list of sold devices
-      totalAmount,          // Total price of all sold devices
-      paymentStatus: 'Completed', // Assume payment is "Completed" for now
-      receipt               // The generated receipt string
-    });
-
-    // Save the sale entry to the database
-    await sale.save();
-
-    // Optionally, send receipt via email
-    const transporter = nodemailer.createTransport({
-      host: 'smtp-relay.brevo.com', // Or another email service (e.g., Brevo)
-      port: 587,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: 'hashirkhan.tech@gmail.com',
-      to: customerEmail,
-      subject: 'Your Purchase Receipt',
-      text: `Thank you for your purchase. Here is your receipt:\n\n${receipt}`,
-    };
-
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.error('Error sending receipt email:', err);
-        return res.status(500).json({ message: 'Receipt email failed' });
-      }
-      console.log('Receipt email sent:', info.response);
-    });
-
-    res.status(201).json({ message: 'Sale logged and receipt generated', sale });
-  } catch (err) {
-    console.error('Error creating sale:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
 };
 // Recall a receipt based on IMEI, modelName, or customerEmail
 exports.recallReceipt = async (req, res) => {
-  const { imei, modelName, customerEmail } = req.query;
+    const { imei, modelName, customerEmail } = req.query;
 
-  try {
-    // Build the query based on provided parameters
-    const query = {};
+    try {
+        // Build the query based on provided parameters
+        const query = {};
 
-    if (imei) {
-      query.imei = imei;
+        if (imei) {
+            query.imei = imei;
+        }
+
+        if (modelName) {
+            query.modelName = modelName;
+        }
+
+        if (customerEmail) {
+            query.customerEmail = customerEmail;
+        }
+
+        // Ensure at least one search parameter is provided
+        if (!imei && !modelName && !customerEmail) {
+            return res
+                .status(400)
+                .json({
+                    message:
+                        "Please provide at least one search criteria: imei, modelName, or customerEmail",
+                });
+        }
+
+        // Find the sale(s) based on the query
+        const sales = await Sales.find(query);
+
+        // Check if any sales are found
+        if (sales.length === 0) {
+            return res
+                .status(404)
+                .json({ message: "No matching receipts found" });
+        }
+
+        // Return the receipts of all matched sales
+        const receipts = sales.map((sale) => ({
+            customerName: sale.customerName,
+            customerEmail: sale.customerEmail,
+            customerAddress: sale.customerAddress,
+            customerPhone: sale.customerPhone,
+            deviceType: sale.deviceType,
+            brand: sale.brand,
+            modelName: sale.modelName,
+            imei: sale.imei,
+            salePrice: sale.salePrice,
+            saleDate: sale.saleDate,
+            receipt: sale.receipt,
+        }));
+
+        res.status(200).json(receipts);
+    } catch (err) {
+        console.error("Error recalling receipt:", err);
+        res.status(500).json({ message: "Server error" });
     }
-
-    if (modelName) {
-      query.modelName = modelName;
-    }
-
-    if (customerEmail) {
-      query.customerEmail = customerEmail;
-    }
-
-    // Ensure at least one search parameter is provided
-    if (!imei && !modelName && !customerEmail) {
-      return res.status(400).json({ message: 'Please provide at least one search criteria: imei, modelName, or customerEmail' });
-    }
-
-    // Find the sale(s) based on the query
-    const sales = await Sales.find(query);
-
-    // Check if any sales are found
-    if (sales.length === 0) {
-      return res.status(404).json({ message: 'No matching receipts found' });
-    }
-
-    // Return the receipts of all matched sales
-    const receipts = sales.map((sale) => ({
-      customerName: sale.customerName,
-      customerEmail: sale.customerEmail,
-      customerAddress: sale.customerAddress,
-      customerPhone: sale.customerPhone,
-      deviceType: sale.deviceType,
-      brand: sale.brand,
-      modelName: sale.modelName,
-      imei: sale.imei,
-      salePrice: sale.salePrice,
-      saleDate: sale.saleDate,
-      receipt: sale.receipt,
-    }));
-
-    res.status(200).json(receipts);
-  } catch (err) {
-    console.error('Error recalling receipt:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
 };
 
 // Get all sales for the store owner
 exports.getAllSales = async (req, res) => {
-  try {
-    const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
+    try {
+        const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
 
-    // Fetch all sales for the store owner
-    const sales = await Sales.find({ storeId: storeOwner.id });
+        // Fetch all sales for the store owner
+        const sales = await Sales.find({ storeId: storeOwner.id });
 
-    // Return the sales records
-    res.status(200).json(sales);
-  } catch (err) {
-    console.error('Error fetching all sales:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
+        // Return the sales records
+        res.status(200).json(sales);
+    } catch (err) {
+        console.error("Error fetching all sales:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 };
 
 // Get receipt by sale ID
 exports.getReceiptById = async (req, res) => {
-  const { receipt_id } = req.params; // Get receipt_id from the request parameters
+    const { receipt_id } = req.params; // Get receipt_id from the request parameters
 
-  try {
-    const storeOwner = req.storeOwner; // Get the authenticated store owner
+    try {
+        const storeOwner = req.storeOwner; // Get the authenticated store owner
 
-    // Fetch the sale using receipt_id and ensure it belongs to the authenticated store owner
-    const sale = await Sales.findOne({ receipt_id: receipt_id, storeId: storeOwner.id });
-    
-    // Check if the sale was found
-    if (!sale) {
-      return res.status(404).json({ message: 'Receipt not found' });
+        // Fetch the sale using receipt_id and ensure it belongs to the authenticated store owner
+        const sale = await Sales.findOne({
+            receipt_id: receipt_id,
+            storeId: storeOwner.id,
+        });
+
+        // Check if the sale was found
+        if (!sale) {
+            return res.status(404).json({ message: "Receipt not found" });
+        }
+
+        // Return the sale details, including the digital receipt
+        res.status(200).json({
+            receipt_id: sale.receipt_id,
+            receipt: sale.receipt, // Include the digital receipt string
+            // Include other relevant sale details if necessary
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
     }
-
-    // Return the sale details, including the digital receipt
-    res.status(200).json({
-      receipt_id: sale.receipt_id,
-      receipt: sale.receipt, // Include the digital receipt string
-      // Include other relevant sale details if necessary
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
 };

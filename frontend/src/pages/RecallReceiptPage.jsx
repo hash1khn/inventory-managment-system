@@ -44,9 +44,6 @@ const RecallReceiptPage = () => {
         <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #d9d9d9', borderRadius: '5px' }}>
           <Title level={2}>Receipt Details</Title>
           <Paragraph><strong>Receipt ID:</strong> {receiptData.receipt_id}</Paragraph>
-          <Paragraph><strong>Customer Name:</strong> {receiptData.customerName}</Paragraph>
-          <Paragraph><strong>Total Amount:</strong> ${receiptData.totalAmount}</Paragraph>
-          <Paragraph><strong>Digital Receipt:</strong></Paragraph>
           <pre style={{ whiteSpace: 'pre-wrap' }}>{receiptData.receipt}</pre> {/* Display digital receipt as a string */}
         </div>
       )}
