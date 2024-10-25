@@ -4,6 +4,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const inventoryRoutes=require('./routes/inventoryRoutes');
 const salesRoutes = require('./routes/salesRoutes');
+const paymentRoutes=require('./routes/payment');
 const morgan = require('morgan'); // Import Morgan
 const cors = require('cors');
 
@@ -25,6 +26,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/inventory',inventoryRoutes);
 app.use('/api/sales', salesRoutes);
+app.use('/api/payment', paymentRoutes); 
 
 // Server
 const PORT = process.env.PORT || 5000;

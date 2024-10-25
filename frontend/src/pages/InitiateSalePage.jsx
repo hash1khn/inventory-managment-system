@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, InputNumber, Table, message } from 'antd';
 import { logSale } from '../services/salesService';
-import { getInventory } from '../services/inventoryService'; // Ensure you have this service to fetch devices
+import { getInventory } from '../services/inventoryService';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const InitiateSalePage = () => {
   const [form] = Form.useForm();
   const [devices, setDevices] = useState([]);
   const [cart, setCart] = useState([]);
-  const [quantities, setQuantities] = useState({}); // State to manage quantities
+  const [quantities, setQuantities] = useState({});
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Fetch all devices when the component mounts
   useEffect(() => {
@@ -31,8 +33,8 @@ const InitiateSalePage = () => {
       return;
     }
 
-    if (quantity > device.availableQuantity) {
-      message.error(`Cannot add more than available quantity (${device.availableQuantity})`);
+    if (quantity > device.quantityAvailable) {
+      message.error(`Cannot add more than available quantity (${device.quantityAvailable})`);
       return;
     }
 
@@ -62,19 +64,33 @@ const InitiateSalePage = () => {
     }));
   };
 
+  const handleRemoveFromCart = (deviceId) => {
+    setCart(cart.filter(item => item.deviceId !== deviceId));
+    message.success(`Removed device ID: ${deviceId} from the cart.`);
+  };
+
+
   const handleSubmit = async (values) => {
-    console.log('Form values:', values);
-    const salesData = { ...values, cart }; // Include cart data in the sales log
+    const totalAmount = calculateTotal(); // Calculate the total amount
+
+    const salesData = { ...values, cart ,totalAmount}; // Include cart data in the sales log
     
     try {
-      const response = await logSale(salesData);
-      console.log('Sale logged successfully:', response);
+      navigate('/payment', { state: { salesData } });
       form.resetFields();
       setCart([]); // Clear the cart after successful sale
-      setQuantities({}); // Reset quantities
+      setQuantities({}); 
+      // Reset quantities
     } catch (error) {
       console.error('Error logging sale:', error);
     }
+  };
+
+  const calculateTotal = () => {
+    return cart.reduce((total, item) => {
+      const device = devices.find(dev => dev._id === item.deviceId);
+      return total + (device ? device.price * item.quantity : 0);
+    }, 0).toFixed(2); // Format to 2 decimal places
   };
 
   const deviceColumns = [
@@ -102,7 +118,7 @@ const InitiateSalePage = () => {
     {
       title: 'Available Quantity',
       dataIndex: 'quantityAvailable',
-      key: 'quanitityAvailable',
+      key: 'quantityAvailable',
     },
     {
       title: 'Quantity',
@@ -141,6 +157,17 @@ const InitiateSalePage = () => {
       dataIndex: 'quantity',
       key: 'quantity',
     },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (text, record) => (
+        <div>
+          <Button  type="danger" onClick={() => handleRemoveFromCart(record.deviceId)} >
+            Remove
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -161,6 +188,9 @@ const InitiateSalePage = () => {
         pagination={false}
       />
       
+      {/* Total Price Display */}
+      <h4>Total: ${calculateTotal()}</h4>
+
       <h2>Initiate Sale</h2>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item

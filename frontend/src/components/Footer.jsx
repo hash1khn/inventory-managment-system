@@ -26,7 +26,7 @@ const Footer = () => {
             backgroundColor: '#FFFFFF',
           }}
         >
-          BomTech Solutions © {new Date().getFullYear()}
+          BomTech Software Solutions © {new Date().getFullYear()}
         </Typography>
       </Container>
     </Box>

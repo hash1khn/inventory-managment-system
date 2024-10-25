@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose); // Import and initialize the plugin
 
 const salesSchema = new mongoose.Schema({
   storeId: {
@@ -64,7 +65,14 @@ const salesSchema = new mongoose.Schema({
     type: String,  // Digital receipt as a string
     required: true,
   },
+  receipt_id: {
+    type: Number,
+    unique: true, // Ensure receipt_id is unique
+  },
 });
+
+// Apply the AutoIncrement plugin to the receipt_id field
+salesSchema.plugin(AutoIncrement, { inc_field: 'receipt_id' });
 
 const Sales = mongoose.model('Sales', salesSchema);
 module.exports = Sales;

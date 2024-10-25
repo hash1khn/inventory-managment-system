@@ -53,3 +53,29 @@ export const getReceipts = async () => {
     throw error; // Re-throw the error to handle it further if necessary
   }
 };
+// New function to get receipt by ID
+export const getReceiptById = async (receiptId) => {
+  const token = localStorage.getItem('token');
+
+  // Debugging: log the request details
+  console.log(`Fetching receipt with ID: ${receiptId}`);
+  console.log('Requesting URL:', `${API_URL}/${receiptId}`);
+  console.log('Authorization token:', token);
+
+  try {
+    const response = await axios.get(`${API_URL}/${receiptId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Debugging: log the response from the API
+    console.log('Receipt fetched successfully:', response.data);
+    return response.data;
+
+  } catch (error) {
+    // Debugging: log the error if the request fails
+    console.error('Error fetching receipt by ID:', error.response ? error.response.data : error.message);
+    throw error; // Re-throw the error to handle it further if necessary
+  }
+};

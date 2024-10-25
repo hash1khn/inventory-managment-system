@@ -7,12 +7,14 @@ import RegisterPage from './pages/RegisterPage';
 import CheckEmailPage from './pages/CheckEmailPage';
 import InventoryPage from './pages/InventoryPage';
 import SalesPage from './pages/SalesPage';
+import PaymentPage from './pages/PaymentPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AddDevicePage from './pages/AddDevicePage';  // New Page
 import InitiateSalePage from './pages/InitiateSalePage';  // New Page
 import RecallReceiptPage from './pages/RecallReceiptPage';  // New Page
 import { Box } from '@mui/material';
+
 import './App.css';
 
 // Create a Material UI theme with the new color palette
@@ -52,7 +54,8 @@ function App() {
               <Route path="/check-email" element={<CheckEmailPage />} />
               <Route path="/add-device" element={<AddDevicePage />} />  {/* New Route */}
               <Route path="/initiate-sale" element={<InitiateSalePage />} />  {/* New Route */}
-              <Route path="/recall-receipt" element={<RecallReceiptPage />} />  {/* New Route */}
+              <Route path="/recall-receipt" element={<RecallReceiptPage />} />
+              <Route path="/payment" element={<PaymentPage/>} />{/* Adjust as necessary */}  {/* New Route */}
               <Route path="/" element={<HomePage />} />  {/* HomePage as default route */}
             </Routes>
           </Box>

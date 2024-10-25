@@ -253,18 +253,25 @@ exports.getAllSales = async (req, res) => {
 
 // Get receipt by sale ID
 exports.getReceiptById = async (req, res) => {
-  const { id } = req.params;
+  const { receipt_id } = req.params; // Get receipt_id from the request parameters
 
   try {
-    const storeOwner = req.storeOwner;
+    const storeOwner = req.storeOwner; // Get the authenticated store owner
 
-    // Fetch the sale and ensure it belongs to the authenticated store owner
-    const sale = await Sales.findOne({ _id: id, storeId: storeOwner.id });
+    // Fetch the sale using receipt_id and ensure it belongs to the authenticated store owner
+    const sale = await Sales.findOne({ receipt_id: receipt_id, storeId: storeOwner.id });
+    
+    // Check if the sale was found
     if (!sale) {
       return res.status(404).json({ message: 'Receipt not found' });
     }
 
-    res.status(200).json(sale);
+    // Return the sale details, including the digital receipt
+    res.status(200).json({
+      receipt_id: sale.receipt_id,
+      receipt: sale.receipt, // Include the digital receipt string
+      // Include other relevant sale details if necessary
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

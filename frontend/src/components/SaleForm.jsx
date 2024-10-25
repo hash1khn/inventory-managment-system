@@ -12,7 +12,7 @@ const SaleForm = ({ onSale }) => {
     const saleData = { customerName, customerEmail, deviceId, salePrice };
 
     try {
-      const response = await logSale(saleData);  // Call the logSale API service
+
       if (response) {
         onSale(saleData);  // Call parent function to update UI after sale is logged
         setCustomerName('');
