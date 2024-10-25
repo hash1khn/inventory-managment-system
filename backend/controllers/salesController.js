@@ -94,7 +94,13 @@ exports.createSale = async (req, res) => {
     } = req.body;
 
     try {
-        const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
+        const storeOwner = req.storeOwner;
+
+        // Fetch the largest receipt_id in the sales records
+        const largestReceipt = await Sales.findOne()
+            .sort({ receipt_id: -1 })
+            .limit(1);
+        const newReceiptId = largestReceipt ? largestReceipt.receipt_id + 1 : 1;
 
         let totalAmount = 0;
         let devicesSold = [];
@@ -107,31 +113,22 @@ exports.createSale = async (req, res) => {
             });
 
             if (!device) {
-                return res
-                    .status(404)
-                    .json({
-                        message: `Device with ID ${item.deviceId} not found in inventory`,
-                    });
+                return res.status(404).json({
+                    message: `Device with ID ${item.deviceId} not found in inventory`,
+                });
             }
 
-            // Check if the device has enough quantity
             if (device.quantityAvailable < item.quantity) {
-                return res
-                    .status(400)
-                    .json({
-                        message: `Insufficient quantity for ${device.modelName}`,
-                    });
+                return res.status(400).json({
+                    message: `Insufficient quantity for ${device.modelName}`,
+                });
             }
 
-            // Calculate the total price for this item and add to totalAmount
             const itemTotalPrice = item.quantity * device.price;
             totalAmount += itemTotalPrice;
-
-            // Decrease the device quantity
             device.quantityAvailable -= item.quantity;
             await device.save();
 
-            // Store the details of the sold device for the receipt
             devicesSold.push({
                 deviceId: device._id,
                 modelName: device.modelName,
@@ -140,14 +137,13 @@ exports.createSale = async (req, res) => {
             });
         }
 
-        // Generate a digital receipt (a simple string for now)
-        let receipt = `Receipt for ${customerName}\nDevices Sold:\n`;
+        // Generate a digital receipt with the receipt ID included
+        let receipt = `Receipt for ${customerName}\nReceipt ID: ${newReceiptId}\nDevices Sold:\n`;
         devicesSold.forEach((device) => {
             receipt += ` - ${device.modelName}: ${device.quantity} units, Total: $${device.itemTotalPrice}\n`;
         });
         receipt += `Total Amount: $${totalAmount}\nSold by: ${storeOwner.storeName}\nAttendant: ${saleAttendant}`;
 
-        // Create the sale entry
         const sale = new Sales({
             storeId: storeOwner.id,
             customerName,
@@ -155,18 +151,17 @@ exports.createSale = async (req, res) => {
             customerAddress,
             customerPhone,
             saleAttendant,
-            devices: devicesSold, // Stores the list of sold devices
-            totalAmount, // Total price of all sold devices
-            paymentStatus: "Completed", // Assume payment is "Completed" for now
-            receipt, // The generated receipt string
+            devices: devicesSold,
+            totalAmount,
+            paymentStatus: "Completed",
+            receipt_id: newReceiptId,
+            receipt,
         });
 
-        // Save the sale entry to the database
         await sale.save();
 
-        // Optionally, send receipt via email
         const transporter = nodemailer.createTransport({
-            host: "smtp-relay.brevo.com", // Or another email service (e.g., Brevo)
+            host: "smtp-relay.brevo.com",
             port: 587,
             auth: {
                 user: process.env.EMAIL_USER,
@@ -200,6 +195,24 @@ exports.createSale = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+exports.getLargestReceiptId = async (req, res) => {
+    try {
+        const largestReceipt = await Sales.findOne()
+            .sort({ receipt_id: -1 })
+            .limit(1);
+
+        if (!largestReceipt) {
+            return res.status(404).json({ message: "No sales records found" });
+        }
+
+        res.status(200).json({ largestReceiptId: largestReceipt.receipt_id });
+    } catch (err) {
+        console.error("Error fetching the largest receipt ID:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 // Recall a receipt based on IMEI, modelName, or customerEmail
 exports.recallReceipt = async (req, res) => {
     const { imei, modelName, customerEmail } = req.query;
@@ -222,12 +235,10 @@ exports.recallReceipt = async (req, res) => {
 
         // Ensure at least one search parameter is provided
         if (!imei && !modelName && !customerEmail) {
-            return res
-                .status(400)
-                .json({
-                    message:
-                        "Please provide at least one search criteria: imei, modelName, or customerEmail",
-                });
+            return res.status(400).json({
+                message:
+                    "Please provide at least one search criteria: imei, modelName, or customerEmail",
+            });
         }
 
         // Find the sale(s) based on the query
