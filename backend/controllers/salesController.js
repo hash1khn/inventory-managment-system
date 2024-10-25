@@ -2,7 +2,7 @@ const Sales = require('../models/salesModel');
 const Device = require('../models/deviceModel');
 const Store = require('../models/storeModel');
 const nodemailer = require('nodemailer');
-const paystack = require('../utils/payment'); // Paystack initialized here
+const stripe = require('../utils/payment'); // Paystack initialized here
 
 // // Create a new sale, charge the fee, and generate a receipt
 // exports.createSale = async (req, res) => {
@@ -84,61 +84,70 @@ const paystack = require('../utils/payment'); // Paystack initialized here
 
 // Create a new sale and generate a receipt (no payment gateway for now)
 exports.createSale = async (req, res) => {
-  const { customerName, customerEmail, customerAddress, customerPhone, modelName, imei, saleAttendant } = req.body;
+  const { customerName, customerEmail, customerAddress, customerPhone, saleAttendant, cart } = req.body;
 
   try {
     const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
 
-    // Find the device being sold using only the modelName
-    const device = await Device.findOne({
-      storeId: storeOwner.id,
-      modelName
-    });
+    let totalAmount = 0;
+    let devicesSold = [];
 
-    if (!device) {
-      return res.status(404).json({ message: 'Device not found in inventory' });
+    // Loop through the cart and process each item
+    for (const item of cart) {
+      const device = await Device.findOne({
+        _id: item.deviceId,
+        storeId: storeOwner.id
+      });
+
+      if (!device) {
+        return res.status(404).json({ message: `Device with ID ${item.deviceId} not found in inventory` });
+      }
+
+      // Check if the device has enough quantity
+      if (device.quantityAvailable < item.quantity) {
+        return res.status(400).json({ message: `Insufficient quantity for ${device.modelName}` });
+      }
+
+      // Calculate the total price for this item and add to totalAmount
+      const itemTotalPrice = item.quantity * device.price;
+      totalAmount += itemTotalPrice;
+
+      // Decrease the device quantity
+      device.quantityAvailable -= item.quantity;
+      await device.save();
+
+      // Store the details of the sold device for the receipt
+      devicesSold.push({
+        deviceId: device._id,
+        modelName: device.modelName,
+        quantity: item.quantity,
+        itemTotalPrice: itemTotalPrice
+      });
     }
-
-    // Check if the device is available in sufficient quantity
-    if (device.quantityAvailable <= 0) {
-      return res.status(400).json({ message: 'Device out of stock' });
-    }
-
-    // Check if the IMEI number is unique in sales records
-    const existingSaleWithIMEI = await Sales.findOne({ imei });
-    if (existingSaleWithIMEI) {
-      return res.status(400).json({ message: 'This IMEI has already been sold' });
-    }
-
-    // Get the device details
-    const { deviceType, brand, price } = device;
 
     // Generate a digital receipt (a simple string for now)
-    const receipt = `Receipt for ${customerName}, device: ${device.modelName}, price: $${price}, IMEI: ${imei}, sold by ${storeOwner.storeName}`;
+    let receipt = `Receipt for ${customerName}\nDevices Sold:\n`;
+    devicesSold.forEach(device => {
+      receipt += ` - ${device.modelName}: ${device.quantity} units, Total: $${device.itemTotalPrice}\n`;
+    });
+    receipt += `Total Amount: $${totalAmount}\nSold by: ${storeOwner.storeName}`;
 
     // Create the sale entry
     const sale = new Sales({
       storeId: storeOwner.id,
       customerName,
       customerEmail,
-      customerAddress,  // Include the customer address
-      customerPhone,    // Include the customer phone number
-      saleAttendant,    // Name of the sales attendant
-      imei,             // IMEI of the device being sold
-      deviceType,       // Automatically fetched device type
-      brand,            // Automatically fetched brand
-      modelName,        // Model name of the device
-      salePrice: price, // Automatically fetched price
+      customerAddress,
+      customerPhone,
+      saleAttendant,
+      devices: devicesSold, // Stores the list of sold devices
+      totalAmount,          // Total price of all sold devices
       paymentStatus: 'Completed', // Assume payment is "Completed" for now
-      receipt,          // Assign the receipt string here
+      receipt               // The generated receipt string
     });
 
     // Save the sale entry to the database
     await sale.save();
-
-    // Decrease the device quantity after sale
-    device.quantityAvailable -= 1;
-    await device.save();
 
     // Optionally, send receipt via email
     const transporter = nodemailer.createTransport({
@@ -154,7 +163,7 @@ exports.createSale = async (req, res) => {
       from: 'hashirkhan.tech@gmail.com',
       to: customerEmail,
       subject: 'Your Purchase Receipt',
-      text: `Thank you for your purchase. Here is your receipt: ${receipt}`,
+      text: `Thank you for your purchase. Here is your receipt:\n\n${receipt}`,
     };
 
     transporter.sendMail(mailOptions, (err, info) => {

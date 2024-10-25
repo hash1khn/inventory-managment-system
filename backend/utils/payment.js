@@ -1,2 +1,2 @@
-const paystack = require('paystack-api')(process.env.PAYSTACK_SECRET); 
-module.exports = paystack;
+// const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// module.exports = stripe;

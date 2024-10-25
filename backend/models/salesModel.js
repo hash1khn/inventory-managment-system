@@ -26,25 +26,29 @@ const salesSchema = new mongoose.Schema({
     type: String,  // Name of the sales attendant handling the sale
     required: true,
   },
-  imei: {
-    type: String,  // IMEI number for the device being sold
-    required: true,
-    unique: true,  // Ensures that each IMEI is unique
-  },
-  deviceType: {
-    type: String, // Automatically fetched from Device model
-    required: true,
-  },
-  brand: {
-    type: String, // Automatically fetched from Device model
-    required: true,
-  },
-  modelName: {
-    type: String, // Model name of the device
-    required: true,
-  },
-  salePrice: {
-    type: Number,
+  devices: [
+    {
+      deviceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Device',
+        required: true,
+      },
+      modelName: {
+        type: String, // Model name of the device sold
+        required: true,
+      },
+      quantity: {
+        type: Number, // Quantity of the device sold
+        required: true,
+      },
+      itemTotalPrice: {
+        type: Number, // Price for the quantity of this device sold
+        required: true,
+      }
+    }
+  ],
+  totalAmount: {
+    type: Number, // Total price for all devices sold in the sale
     required: true,
   },
   saleDate: {
