@@ -56,8 +56,11 @@ exports.getDeviceById = async (req, res) => {
 // Get all devices in the store's inventory
 exports.getAllDevices = async (req, res) => {
   try {
-    // Logic to fetch all devices
-    const devices = await Device.find(); // Assuming you have a Device model
+    const storeOwner = req.storeOwner; // Authenticated store owner from authMiddleware
+
+    // Fetch all devices belonging to the authenticated store owner
+    const devices = await Device.find({ storeId: storeOwner.id });
+    
     res.status(200).json(devices);
   } catch (err) {
     console.error(err);
