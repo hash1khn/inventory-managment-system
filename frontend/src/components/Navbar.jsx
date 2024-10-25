@@ -1,28 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import "./Navbar.css"; // Ensure this CSS file is imported
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { isLoggedIn, logout } = useAuth();
     const navigate = useNavigate();
-
-    // This simulates checking for a user token (for example, from localStorage)
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            setIsLoggedIn(true);
-        }
-    }, []);
 
     const handleLogout = () => {
         // Clear the auth token when logging out
-        localStorage.removeItem("token");
-        setIsLoggedIn(false);
+        logout();
         navigate("/login"); // Redirect to login page after logout
     };
 

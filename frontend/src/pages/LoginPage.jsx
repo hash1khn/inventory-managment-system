@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Typography, Alert } from 'antd';
-import { login } from '../services/authService';
 import { useNavigate } from 'react-router-dom';  // useNavigate instead of useHistory
 import './LoginPage.css';
+import { useAuth } from '../context/AuthContext';
 
 const { Title } = Typography;
 
 const LoginPage = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate(); 
-
+  const { login } = useAuth();
   const handleSubmit = async (values) => {
     const { email, password } = values;
     try {
       await login(email, password);
+      login();
       navigate('/inventory');  // Redirect to inventory page after login
     } catch (err) {
       setError('Invalid login credentials');
